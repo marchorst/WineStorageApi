@@ -25,7 +25,7 @@ class VivinoWineImporterController extends AbstractController
         $wineRepo = $entityManager->getRepository(Wine::class);
 
         $wines = $wineRepo->findBy([
-            'WineImage' => null
+            'wineImage' => null
         ], null, 1);
         set_time_limit(120);
         $retVal = [];
