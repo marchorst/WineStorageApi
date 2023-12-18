@@ -31,11 +31,11 @@ class VivinoWineImporterController extends AbstractController
         $retVal = [];
         foreach ($wines as $wine) {
             $searchterm =
-                $wine->getName() .
+                $wine->getWineName() .
                 '+' .
                 $wine->getVintage() .
                 '+' .
-                $wine->getProducer();
+                $wine->getWinery();
             $searchterm = urlencode($searchterm);
             $url = 'https://www.vivino.com/search/wines?q=' . $searchterm;
             $userAgent =
