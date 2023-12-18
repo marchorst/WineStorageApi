@@ -37,4 +37,4 @@ cp .env .env.local
 ```
 6. Adjust the values in the .env.local file according to your environment and configuration needs.
 
-Run the WineStorageApi alongside the WineStorageUi to access and manage your wine collection.
+The latest WineStorageUi is available on the root path.
