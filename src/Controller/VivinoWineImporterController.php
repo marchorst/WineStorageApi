@@ -13,8 +13,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Wine;
-use App\Entity\WineType;
-use App\Entity\Tag;
 
 class VivinoWineImporterController extends AbstractController
 {
@@ -24,7 +22,6 @@ class VivinoWineImporterController extends AbstractController
         EntityManagerInterface $entityManager,
         SluggerInterface $slugger
     ): Response {
-        $tagRepo = $entityManager->getRepository(Tag::class);
         $wineRepo = $entityManager->getRepository(Wine::class);
 
         $wines = $wineRepo->findBy([
