@@ -12,7 +12,7 @@ class IndexController extends AbstractController
     public function index(): Response
     {
         return $this->render('index/index.html.twig', [
-            'version' => filemtime('../public/app/index.html'),
+            'version' => filemtime('../public/app/main.js'),
             'controller_name' => 'IndexController',
         ]);
     }
