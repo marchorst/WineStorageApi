@@ -65,6 +65,9 @@ class Wine
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $region = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $varietal = null;
+
     public function __construct()
     {
     }
@@ -193,6 +196,18 @@ class Wine
     public function setRegion(?string $Region): static
     {
         $this->region = $Region;
+
+        return $this;
+    }
+
+    public function getVarietal(): ?string
+    {
+        return $this->varietal;
+    }
+
+    public function setVarietal(?string $varietal): static
+    {
+        $this->varietal = $varietal;
 
         return $this;
     }
