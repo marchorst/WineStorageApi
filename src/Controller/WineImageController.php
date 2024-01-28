@@ -51,7 +51,7 @@ class WineImageController extends AbstractController
 
         if($wine->getWineImage()) {
             
-            unlink($this->getParameter('kernel.project_dir')."/public".$wine->getWineImage());
+            unlink($this->getParameter('kernel.project_dir')."/public/".$wine->getWineImage());
         }
         $wine->setWineImage($newFilename);
 
@@ -71,7 +71,7 @@ class WineImageController extends AbstractController
        
         if($wine->getWineImage()) {
             
-            unlink($this->getParameter('kernel.project_dir')."/public".$wine->getWineImage());
+            ($this->getParameter('kernel.project_dir')."/public/".$wine->getWineImage());
         }
         $wine->setWineImage("");
 
