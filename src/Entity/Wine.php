@@ -68,8 +68,12 @@ class Wine
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $varietal = null;
 
+    #[ORM\OneToMany(mappedBy: 'fieldcontext', targetEntity: CustomFieldValue::class, orphanRemoval: true)]
+    private Collection $customFieldValues;
+
     public function __construct()
     {
+        $this->customFieldValues = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -208,6 +212,36 @@ class Wine
     public function setVarietal(?string $varietal): static
     {
         $this->varietal = $varietal;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CustomFieldValue>
+     */
+    public function getCustomFieldValues(): Collection
+    {
+        return $this->customFieldValues;
+    }
+
+    public function addCustomFieldValue(CustomFieldValue $customFieldValue): static
+    {
+        if (!$this->customFieldValues->contains($customFieldValue)) {
+            $this->customFieldValues->add($customFieldValue);
+            $customFieldValue->setFieldcontext($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCustomFieldValue(CustomFieldValue $customFieldValue): static
+    {
+        if ($this->customFieldValues->removeElement($customFieldValue)) {
+            // set the owning side to null (unless already changed)
+            if ($customFieldValue->getFieldcontext() === $this) {
+                $customFieldValue->setFieldcontext(null);
+            }
+        }
 
         return $this;
     }
