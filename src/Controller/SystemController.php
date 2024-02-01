@@ -18,6 +18,8 @@ class SystemController extends AbstractController
     {
         $outputs=null;
         $retval=null;
+        exec('whoami', $output, $retval);
+        $outputs[] = $output;
         exec('git reset --hard', $output, $retval);
         $outputs[] = $output;
         exec('git pull origin main', $output, $retval);
