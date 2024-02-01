@@ -26,4 +26,9 @@ class SystemController extends AbstractController
         $outputs[] = "Returned with status $retval and output:\n";
         return $this->json($outputs);
     }
+    #[Route('/version', name: 'version')]
+    public function version(EntityManagerInterface $entityManager): JsonResponse
+    {
+        return $this->json("1.0");
+    }
 }
