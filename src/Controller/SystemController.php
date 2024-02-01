@@ -17,7 +17,7 @@ class SystemController extends AbstractController
     public function index(EntityManagerInterface $entityManager): JsonResponse
     {
         $outputs=shell_exec('/bin/bash update.sh');
-        return $this->json($output);
+        return $this->json($outputs);
     }
     #[Route('/version', name: 'version')]
     public function version(EntityManagerInterface $entityManager): JsonResponse
