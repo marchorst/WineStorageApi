@@ -18,10 +18,7 @@ class SystemController extends AbstractController
     {
         $outputs=null;
         $retval=null;
-        exec('whoami', $output, $retval);
-        exec('git reset --hard', $output, $retval);
-        exec('git pull origin main', $output, $retval);
-        exec('composer install', $output, $retval);
+        exec('/bin/bash update.sh', $output, $retval);
         return $this->json($output);
     }
     #[Route('/version', name: 'version')]
