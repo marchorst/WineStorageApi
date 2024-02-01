@@ -19,14 +19,10 @@ class SystemController extends AbstractController
         $outputs=null;
         $retval=null;
         exec('whoami', $output, $retval);
-        $outputs[] = $output;
         exec('git reset --hard', $output, $retval);
-        $outputs[] = $output;
         exec('git pull origin main', $output, $retval);
-        $outputs[] = $output;
         exec('composer install', $output, $retval);
-        $outputs[] = "Returned with status $retval and output:\n";
-        return $this->json($outputs);
+        return $this->json($output);
     }
     #[Route('/version', name: 'version')]
     public function version(EntityManagerInterface $entityManager): JsonResponse
