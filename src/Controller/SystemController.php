@@ -22,7 +22,7 @@ class SystemController extends AbstractController
             $outputs=shell_exec('cmd /c update.bat');
         }
         
-        return $this->json($outputs);
+        return $this->json(["result" => $outputs]);
     }
     #[Route('/version', name: 'version')]
     public function version(EntityManagerInterface $entityManager): JsonResponse
