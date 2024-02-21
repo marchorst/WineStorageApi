@@ -25,70 +25,81 @@ class VivinoWineImporterController extends AbstractController
         $wineRepo = $entityManager->getRepository(Wine::class);
 
         $wines = $wineRepo->findBy([
-            'wineImage' => null
+            'wineImage' => ""
         ], null, 1);
         set_time_limit(120);
         $retVal = [];
         foreach ($wines as $wine) {
-            $searchterm =
-                $wine->getWineName() .
-                '+' .
-                $wine->getVintage() .
-                '+' .
-                $wine->getWinery();
-            $searchterm = urlencode($searchterm);
-            $url = 'https://www.vivino.com/search/wines?q=' . $searchterm;
-            $userAgent =
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';
-            // Get HTML content from the URL
-            $html = $this->getUrlContent($url, $userAgent);
+           $wineImage = $this->getWineLabelFromVivino($wine);
+           if (!empty($wineImage)) {
+            $value = str_replace('300x300', '600x600', $wineImage);
 
-            $value = $this->getBackgroundImageUrl(
-                $html,
-                "//*[@class='wine-card__image']"
+            // Fetch the content of the file
+            $content = $this->getUrlContent('https:' . $value, $userAgent);
+
+            // Create a temporary file and write the content into it
+            $temporaryFilePath = tempnam(
+                sys_get_temp_dir(),
+                'imported_file'
             );
-            if (!empty($value)) {
-                $value = str_replace('300x300', '600x600', $value);
+            file_put_contents($temporaryFilePath, $content);
 
-                // Fetch the content of the file
-                $content = $this->getUrlContent('https:' . $value, $userAgent);
+            // Create a Symfony File object from the temporary file
+            $wineImage = new File($temporaryFilePath);
 
-                // Create a temporary file and write the content into it
-                $temporaryFilePath = tempnam(
-                    sys_get_temp_dir(),
-                    'imported_file'
-                );
-                file_put_contents($temporaryFilePath, $content);
+            $originalFilename = pathinfo($temporaryFilePath, PATHINFO_BASENAME);
 
-                // Create a Symfony File object from the temporary file
-                $wineImage = new File($temporaryFilePath);
+            // this is needed to safely include the file name as part of the URL
+            $safeFilename = $slugger->slug($originalFilename);
 
-                $originalFilename = pathinfo($temporaryFilePath, PATHINFO_BASENAME);
+            $newFilename =
+                $safeFilename .
+                '-' .
+                uniqid() .
+                '.' .
+                $wineImage->guessExtension();
+            $wineImage->move(
+                $this->getParameter('wine_directory'),
+                $newFilename
+            );
 
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-
-                $newFilename =
-                    $safeFilename .
-                    '-' .
-                    uniqid() .
-                    '.' .
-                    $wineImage->guessExtension();
-                $wineImage->move(
-                    $this->getParameter('wine_directory'),
-                    $newFilename
-                );
-            } else {
-                $newFilename = "default.png";
-            }
             $wine->setWineImage($newFilename);
 
             $entityManager->persist($wine);
             $entityManager->flush();
-            $retVal[] = $newFilename;
+
+        $retVal[] = $newFilename;
+        } 
         }
         
         return new Response(json_encode($retVal),Response::HTTP_OK, ['content-type' => 'text/json' ]);
+    }
+
+    private function getWineLabelFromVivino($wine) {
+        $searchterm =
+        $wine->getWineName() .
+        '+' .
+        $wine->getVintage() .
+        '+' .
+        $wine->getWinery();
+        $searchterm = urlencode($searchterm);
+        $url = 'https://www.vivino.com/search/wines?q=' . $searchterm;
+        $userAgent =
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';
+        // Get HTML content from the URL
+        $html = $this->getUrlContent($url, $userAgent);
+
+        return $this->getBackgroundImageUrl(
+            $html,
+            "//*[@class='wine-card__image']"
+        );
+        
+    }
+
+    #[Route('/wine/importer/research/{id}', name: 'app_wine_importer_vivinoimages_single', methods: ['GET', 'POST'])]
+    public function getWineLabelFromVivinoReq(Wine $wine,
+    Request $request) {
+        return new Response(json_encode($this->getWineLabelFromVivino($wine)),Response::HTTP_OK, ['content-type' => 'text/json' ]);
     }
 
     private function getUrlContent($url, $userAgent)
